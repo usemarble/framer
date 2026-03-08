@@ -1,0 +1,9 @@
+{
+  "id": "948e6d",
+  "name": "Marble CMS",
+  "modes": [
+    "configureManagedCollection",
+    "syncManagedCollection"
+  ],
+  "icon": "/icon.svg"
+}
