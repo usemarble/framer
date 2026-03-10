@@ -15,6 +15,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@usemarble/sdk": "^1.1.2",
     "framer-plugin": "^3.6.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
