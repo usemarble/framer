@@ -56,6 +56,18 @@ input[type="text"]:disabled,
     border-radius: 8px;
 }
 
+.marble-logo img {
+    display: none;
+}
+
+[data-framer-theme="light"] .marble-logo .marble-logo-dark {
+    display: block;
+}
+
+[data-framer-theme="dark"] .marble-logo .marble-logo-light {
+    display: block;
+}
+
 .setup {
     align-items: center;
 }
@@ -95,6 +107,21 @@ input[type="text"]:disabled,
     width: 100%;
     justify-content: space-between;
     color: var(--framer-color-text-secondary);
+}
+
+.setup .api-key-label {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    height: auto;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--framer-color-text-tertiary);
+}
+
+.setup .api-key-label input {
+    width: 100%;
 }
 
 .mapping {
