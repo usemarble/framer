@@ -222,7 +222,19 @@ export async function getDataSource(
 
         const data = await response.json()
 
-        const pageItems: MarbleItem[] = Array.isArray(data) ? data : (data[dataSourceId] ?? [])
+        let pageItems: MarbleItem[]
+        if (Array.isArray(data)) {
+            pageItems = data
+        } else if (dataSourceId in data && Array.isArray(data[dataSourceId])) {
+            pageItems = data[dataSourceId]
+        } else {
+            const message = `API response missing expected key "${dataSourceId}". Got keys: ${Object.keys(data ?? {}).join(", ") || "none"}`
+            if (page === 1) {
+                throw new Error(`Marble API error: ${message}`)
+            }
+            console.warn(`[Marble] ${message}`)
+            pageItems = []
+        }
 
         allItems.push(...pageItems)
         console.log(`[Marble] Page ${page}: ${pageItems.length} items (${allItems.length} total)`)
