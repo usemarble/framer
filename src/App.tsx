@@ -91,7 +91,6 @@ export function App({
 		<FieldMapping
 			collection={collection}
 			dataSource={dataSource}
-			apiKey={apiKey}
 		/>
 	);
 }

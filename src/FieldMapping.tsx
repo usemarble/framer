@@ -75,13 +75,11 @@ Object.freeze(emptyFields);
 interface FieldMappingProps {
 	collection: ManagedCollection;
 	dataSource: DataSource;
-	apiKey: string;
 }
 
 export function FieldMapping({
 	collection,
 	dataSource,
-	apiKey,
 }: FieldMappingProps) {
 	const [status, setStatus] = useState<
 		"mapping-fields" | "loading-fields" | "syncing-collection"
@@ -196,9 +194,6 @@ export function FieldMapping({
 			setStatus("mapping-fields");
 		}
 	};
-
-	// apiKey is passed for potential future use (e.g., re-fetching during mapping)
-	void apiKey;
 
 	if (isLoadingFields) {
 		return (
