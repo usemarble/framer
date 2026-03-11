@@ -20,6 +20,8 @@ export const PLUGIN_KEYS = {
 // to https://api.marblecms.com/* by the dev server (see vite.config.ts).
 const MARBLE_API_BASE = "/marble-api/v1"
 
+const MAX_PAGINATION_PAGES = 100
+
 export interface DataSource {
     id: string
     fields: readonly ManagedCollectionFieldInput[]
@@ -81,8 +83,23 @@ type MarbleItem = Post | Category | Tag | Author
 
 // --- Image upload helper ---
 
+const ALLOWED_IMAGE_HOSTS = [
+    "cdn.marblecms.com",
+    "images.marblecms.com",
+    "media.marblecms.com",
+] as const
+
+function isAllowedImageUrl(url: string): boolean {
+    try {
+        const parsed = new URL(url)
+        return parsed.protocol === "https:" && ALLOWED_IMAGE_HOSTS.some((host) => host === parsed.hostname)
+    } catch {
+        return false
+    }
+}
+
 async function uploadImageIfPresent(url: string | null | undefined): Promise<string | null> {
-    if (!url) return null
+    if (!url || !isAllowedImageUrl(url)) return null
 
     try {
         const response = await fetch(url)
@@ -213,6 +230,10 @@ export async function getDataSource(
         // Check if there are more pages
         const nextPage = data?.pagination?.nextPage
         if (!nextPage || pageItems.length === 0) break
+        if (page >= MAX_PAGINATION_PAGES) {
+            console.warn(`[Marble] Reached maximum pagination limit (${MAX_PAGINATION_PAGES} pages)`)
+            break
+        }
         page = nextPage
     }
 
