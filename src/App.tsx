@@ -36,14 +36,14 @@ export function App({
 	}, [dataSource]);
 
 	useEffect(() => {
-		if (!previousDataSourceId || !apiKey) {
+		if (!previousDataSourceId || !previousApiKey) {
 			return;
 		}
 
 		const abortController = new AbortController();
 
 		setIsLoadingDataSource(true);
-		getDataSource(previousDataSourceId, apiKey, abortController.signal)
+		getDataSource(previousDataSourceId, previousApiKey, abortController.signal)
 			.then(setDataSource)
 			.catch((error) => {
 				if (abortController.signal.aborted) return;
@@ -62,7 +62,7 @@ export function App({
 			});
 
 		return () => abortController.abort();
-	}, [previousDataSourceId, apiKey]);
+	}, [previousDataSourceId, previousApiKey]);
 
 	const handleApiKeyChange = async (newApiKey: string) => {
 		setApiKey(newApiKey);
