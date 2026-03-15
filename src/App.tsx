@@ -3,8 +3,8 @@ import "./App.css";
 import { framer, type ManagedCollection } from "framer-plugin";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { type DataSource, getDataSource, PLUGIN_KEYS } from "./data";
-import { FieldMapping } from "./FieldMapping";
-import { SelectDataSource } from "./SelectDataSource";
+import { FieldMapping } from "./components/FieldMapping";
+import { SelectDataSource } from "./components/SelectDataSource";
 
 interface AppProps {
 	collection: ManagedCollection;

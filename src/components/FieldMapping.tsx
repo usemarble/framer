@@ -11,7 +11,7 @@ import {
 	mergeFieldsWithExistingFields,
 	syncCollection,
 	syncMethods,
-} from "./data";
+} from "../data";
 
 interface FieldMappingRowProps {
 	field: ManagedCollectionFieldInput;

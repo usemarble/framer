@@ -1,6 +1,6 @@
 import { framer } from "framer-plugin";
 import { useState } from "react";
-import { type DataSource, dataSourceOptions, getDataSource } from "./data";
+import { type DataSource, dataSourceOptions, getDataSource } from "../data";
 
 interface SelectDataSourceProps {
 	apiKey: string;
