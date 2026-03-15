@@ -83,16 +83,12 @@ type MarbleItem = Post | Category | Tag | Author
 
 // --- Image upload helper ---
 
-const ALLOWED_IMAGE_HOSTS = [
-    "cdn.marblecms.com",
-    "images.marblecms.com",
-    "media.marblecms.com",
-] as const
+const ALLOWED_IMAGE_HOSTS = ["cdn.marblecms.com", "images.marblecms.com", "media.marblecms.com"] as const
 
 function isAllowedImageUrl(url: string): boolean {
     try {
         const parsed = new URL(url)
-        return parsed.protocol === "https:" && ALLOWED_IMAGE_HOSTS.some((host) => host === parsed.hostname)
+        return parsed.protocol === "https:" && ALLOWED_IMAGE_HOSTS.some(host => host === parsed.hostname)
     } catch {
         return false
     }
