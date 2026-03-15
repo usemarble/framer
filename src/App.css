@@ -214,3 +214,19 @@ input[type="text"]:disabled,
 .mapping footer > button {
     text-transform: capitalize;
 }
+
+.mapping footer > button.primary {
+    background-color: var(--framer-color-tint, #0091ff);
+    color: white;
+    font-weight: 600;
+}
+
+.mapping footer > button.primary:hover:not(:disabled) {
+    background-color: var(--framer-color-tint, #0091ff);
+    filter: brightness(1.08);
+}
+
+.mapping footer > button.primary:disabled {
+    background-color: var(--framer-color-bg-tertiary);
+    color: var(--framer-color-text-tertiary);
+}

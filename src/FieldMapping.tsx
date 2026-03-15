@@ -231,6 +231,7 @@ export function FieldMapping({
 					<hr />
 					<button
 						type="submit"
+						className="primary"
 						disabled={isSyncing || !isAllowedToManage}
 						title={isAllowedToManage ? undefined : "Insufficient permissions"}
 					>
