@@ -98,6 +98,7 @@ function isAllowedImageUrl(url: string): boolean {
 
 async function mapPostToFieldData(post: Post): Promise<FieldDataInput> {
     const fieldData: FieldDataInput = {
+        __marbleId: { type: "string", value: post.id },
         title: { type: "string", value: post.title },
         slug: { type: "string", value: post.slug },
         content: {
@@ -125,6 +126,7 @@ async function mapPostToFieldData(post: Post): Promise<FieldDataInput> {
 
 function mapCategoryToFieldData(category: Category): FieldDataInput {
     return {
+        __marbleId: { type: "string", value: category.id },
         name: { type: "string", value: category.name },
         slug: { type: "string", value: category.slug },
         description: { type: "string", value: category.description ?? "" },
@@ -133,6 +135,7 @@ function mapCategoryToFieldData(category: Category): FieldDataInput {
 
 function mapTagToFieldData(tag: Tag): FieldDataInput {
     return {
+        __marbleId: { type: "string", value: tag.id },
         name: { type: "string", value: tag.name },
         slug: { type: "string", value: tag.slug },
         description: { type: "string", value: tag.description ?? "" },
@@ -141,6 +144,7 @@ function mapTagToFieldData(tag: Tag): FieldDataInput {
 
 async function mapAuthorToFieldData(author: Author): Promise<FieldDataInput> {
     const fieldData: FieldDataInput = {
+        __marbleId: { type: "string", value: author.id },
         name: { type: "string", value: author.name },
         slug: { type: "string", value: author.slug },
         bio: { type: "string", value: author.bio ?? "" },
@@ -265,27 +269,36 @@ export async function syncCollection(
         const item = dataSource.items[i]
         if (!item) throw new Error("Logic error")
 
-        // Every Marble resource has a slug — use it directly
         const slugValue = item["slug"]
         if (!slugValue || typeof slugValue.value !== "string") {
             console.warn(`Skipping item at index ${i} because it doesn't have a valid slug`)
             continue
         }
 
+        const marbleId = item["__marbleId"]
+        const marbleIdStr =
+            marbleId &&
+            typeof marbleId === "object" &&
+            "value" in marbleId &&
+            typeof marbleId.value === "string"
+                ? marbleId.value
+                : null
+
+        // Use Marble id for Framer item id (avoids slug length limits); slug stays for display
+        const itemId = marbleIdStr ?? slugValue.value
         unsyncedItems.delete(slugValue.value)
+        unsyncedItems.delete(itemId)
 
         const fieldData: FieldDataInput = {}
         for (const [fieldName, value] of Object.entries(item)) {
+            if (fieldName === "__marbleId") continue
             const field = fields.find(field => field.id === fieldName)
-
-            // Field is in the data but skipped based on selected fields.
             if (!field) continue
-
             fieldData[field.id] = value
         }
 
         items.push({
-            id: slugValue.value,
+            id: itemId,
             slug: slugValue.value,
             draft: false,
             fieldData,
