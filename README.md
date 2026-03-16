@@ -1,19 +1,11 @@
-# CMS Starter
+# Marble Framer Plugin
 
-This is a starter for building a CMS plugin for Framer.
+Sync Marble content with Framer CMS. Map posts, categories, tags, and authors to CMS fields and import with one click.
 
-Run the development server:
+**[Install from the Framer Marketplace →](https://marketplace.framer.com/marketplace/plugins/marble/)**
+
+## Development
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
 pnpm dev
-# or
-bun dev
 ```
-
-And [open in Framer](https://www.framer.com/developers/plugins/quick-start#opening-in-framer).
-
-Learn more: https://www.framer.com/developers/plugins/introduction
