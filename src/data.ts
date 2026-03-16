@@ -36,7 +36,7 @@ export const dataSourceOptions = [
     { id: "authors", name: "Authors" },
 ] as const
 
-// --- Field definitions for each Marble CMS resource ---
+// --- Field definitions for each Marble resource ---
 
 const postFields: ManagedCollectionFieldInput[] = [
     { id: "title", name: "Title", type: "string" },

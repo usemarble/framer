@@ -71,7 +71,7 @@ export function SelectDataSource({
 				</div>
 				<div className="content">
 					<h2>Marble</h2>
-					<p>Sync your Marble CMS content into Framer.</p>
+					<p>Sync your Marble content into Framer.</p>
 				</div>
 			</div>
 

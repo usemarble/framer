@@ -1,6 +1,6 @@
 {
   "id": "948e6d",
-  "name": "Marble CMS",
+  "name": "Marble",
   "modes": [
     "configureManagedCollection",
     "syncManagedCollection"
