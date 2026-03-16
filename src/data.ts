@@ -17,9 +17,11 @@ export const PLUGIN_KEYS = {
     SLUG_FIELD_ID: "slugFieldId",
 } as const
 
-// Use the Vite proxy to bypass CORS. Requests to /marble-api/* are proxied
-// to https://api.marblecms.com/* by the dev server (see vite.config.ts).
-const MARBLE_API_BASE = "/marble-api/v1"
+// In dev, use Vite proxy (/marble-api/* → api.marblecms.com) to avoid CORS.
+// In production, fetch directly from the API (Framer plugin runs on framercdn.com).
+const MARBLE_API_BASE = import.meta.env.DEV
+	? "/marble-api/v1"
+	: "https://api.marblecms.com/v1"
 
 const MAX_PAGINATION_PAGES = 100
 
