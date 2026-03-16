@@ -1,6 +1,6 @@
 import "./App.css";
 
-import { framer, type ManagedCollection } from "framer-plugin";
+import { framer, type ManagedCollection, useIsAllowedTo } from "framer-plugin";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { type DataSource, getDataSource, PLUGIN_KEYS } from "./data";
 import { FieldMapping } from "./components/FieldMapping";
@@ -64,9 +64,13 @@ export function App({
 		return () => abortController.abort();
 	}, [previousDataSourceId, previousApiKey]);
 
+	const isAllowedToSetData = useIsAllowedTo("ManagedCollection.setPluginData");
+
 	const handleApiKeyChange = async (newApiKey: string) => {
 		setApiKey(newApiKey);
-		await collection.setPluginData(PLUGIN_KEYS.API_KEY, newApiKey);
+		if (isAllowedToSetData) {
+			await collection.setPluginData(PLUGIN_KEYS.API_KEY, newApiKey);
+		}
 	};
 
 	if (isLoadingDataSource) {

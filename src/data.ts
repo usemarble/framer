@@ -83,33 +83,16 @@ type MarbleItem = Post | Category | Tag | Author
 
 // --- Image upload helper ---
 
-const ALLOWED_IMAGE_HOSTS = ["cdn.marblecms.com", "images.marblecms.com", "media.marblecms.com"] as const
-
 function isAllowedImageUrl(url: string): boolean {
     try {
         const parsed = new URL(url)
-        return parsed.protocol === "https:" && ALLOWED_IMAGE_HOSTS.some(host => host === parsed.hostname)
+        return parsed.protocol === "https:" || parsed.protocol === "http:"
     } catch {
         return false
     }
 }
 
-async function uploadImageIfPresent(url: string | null | undefined): Promise<string | null> {
-    if (!url || !isAllowedImageUrl(url)) return null
 
-    try {
-        const response = await fetch(url)
-        if (!response.ok) return null
-
-        const blob = await response.blob()
-        const file = new File([blob], "image.jpg", { type: blob.type || "image/jpeg" })
-        const asset = await framer.uploadImage(file)
-        return asset.id
-    } catch (error) {
-        console.warn("Failed to upload image:", url, error)
-        return null
-    }
-}
 
 // --- Map API items to Framer field data ---
 
@@ -133,9 +116,8 @@ async function mapPostToFieldData(post: Post): Promise<FieldDataInput> {
         fieldData.updatedAt = { type: "date", value: String(post.updatedAt) }
     }
 
-    const uploadedImage = await uploadImageIfPresent(post.coverImage)
-    if (uploadedImage) {
-        fieldData.coverImage = { type: "image", value: uploadedImage }
+    if (post.coverImage && isAllowedImageUrl(post.coverImage)) {
+        fieldData.coverImage = { type: "image", value: post.coverImage }
     }
 
     return fieldData
@@ -165,9 +147,8 @@ async function mapAuthorToFieldData(author: Author): Promise<FieldDataInput> {
         role: { type: "string", value: author.role ?? "" },
     }
 
-    const uploadedImage = await uploadImageIfPresent(author.image)
-    if (uploadedImage) {
-        fieldData.image = { type: "image", value: uploadedImage }
+    if (author.image && isAllowedImageUrl(author.image)) {
+        fieldData.image = { type: "image", value: author.image }
     }
 
     return fieldData
