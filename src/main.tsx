@@ -11,6 +11,9 @@ const activeCollection = await framer.getActiveManagedCollection();
 const previousDataSourceId = await activeCollection.getPluginData(
 	PLUGIN_KEYS.DATA_SOURCE_ID,
 );
+const previousSlugFieldId = await activeCollection.getPluginData(
+	PLUGIN_KEYS.SLUG_FIELD_ID,
+);
 const previousApiKey = await activeCollection.getPluginData(
 	PLUGIN_KEYS.API_KEY,
 );
@@ -18,6 +21,7 @@ const previousApiKey = await activeCollection.getPluginData(
 const { didSync } = await syncExistingCollection(
 	activeCollection,
 	previousDataSourceId,
+	previousSlugFieldId,
 	previousApiKey,
 );
 
@@ -34,6 +38,7 @@ if (didSync) {
 			<App
 				collection={activeCollection}
 				previousDataSourceId={previousDataSourceId}
+				previousSlugFieldId={previousSlugFieldId}
 				previousApiKey={previousApiKey}
 			/>
 		</StrictMode>,

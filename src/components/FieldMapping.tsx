@@ -4,9 +4,10 @@ import {
 	type ManagedCollectionFieldInput,
 	useIsAllowedTo,
 } from "framer-plugin";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
 	type DataSource,
+	PLUGIN_KEYS,
 	dataSourceOptions,
 	mergeFieldsWithExistingFields,
 	syncCollection,
@@ -75,15 +76,17 @@ Object.freeze(emptyFields);
 interface FieldMappingProps {
 	collection: ManagedCollection;
 	dataSource: DataSource;
+	initialSlugFieldId: string | null;
 }
 
 export function FieldMapping({
 	collection,
 	dataSource,
+	initialSlugFieldId,
 }: FieldMappingProps) {
 	const [status, setStatus] = useState<
 		"mapping-fields" | "loading-fields" | "syncing-collection"
-	>("mapping-fields");
+	>(initialSlugFieldId ? "loading-fields" : "mapping-fields");
 	const isSyncing = status === "syncing-collection";
 	const isLoadingFields = status === "loading-fields";
 
@@ -93,9 +96,34 @@ export function FieldMapping({
 		new Set(),
 	);
 
+	const possibleSlugFields = useMemo(() => {
+		const slugEligibleIds =
+			dataSource.id === "posts" ? ["title", "slug"] : ["name", "slug"];
+		return dataSource.fields.filter(
+			(field) => field.type === "string" && slugEligibleIds.includes(field.id),
+		);
+	}, [dataSource.fields, dataSource.id]);
+
+	const [selectedSlugField, setSelectedSlugField] =
+		useState<ManagedCollectionFieldInput | null>(
+			possibleSlugFields.find((f) => f.id === initialSlugFieldId) ??
+				possibleSlugFields.find((f) => f.id === "slug") ??
+				possibleSlugFields[0] ??
+				null,
+		);
+
 	const dataSourceName =
 		dataSourceOptions.find((option) => option.id === dataSource.id)?.name ??
 		dataSource.id;
+
+	useEffect(() => {
+		setSelectedSlugField(
+			possibleSlugFields.find((f) => f.id === initialSlugFieldId) ??
+				possibleSlugFields.find((f) => f.id === "slug") ??
+				possibleSlugFields[0] ??
+				null,
+		);
+	}, [initialSlugFieldId, possibleSlugFields]);
 
 	useEffect(() => {
 		const abortController = new AbortController();
@@ -113,8 +141,6 @@ export function FieldMapping({
 					collectionFields.map((field) => field.id),
 				);
 
-				// On re-sync, ignore new fields that weren't in the original collection.
-				// On first import (no existing fields), check all fields by default.
 				if (collectionFields.length > 0) {
 					const ignoredIds = new Set<string>();
 					for (const sourceField of dataSource.fields) {
@@ -172,17 +198,25 @@ export function FieldMapping({
 	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
+		if (!selectedSlugField) {
+			framer.notify("Please select a slug field before importing.", {
+				variant: "warning",
+			});
+			return;
+		}
+
 		try {
 			setStatus("syncing-collection");
 
 			const fieldsToSync: ManagedCollectionFieldInput[] = [];
 			for (const field of fields) {
-				if (ignoredFieldIds.has(field.id)) continue;
+				if (ignoredFieldIds.has(field.id) || field.id === "slug") continue;
 				fieldsToSync.push({ ...field, name: field.name.trim() || field.id });
 			}
 
 			await collection.setFields(fieldsToSync);
-			await syncCollection(collection, dataSource, fieldsToSync);
+			await collection.setPluginData(PLUGIN_KEYS.SLUG_FIELD_ID, selectedSlugField.id);
+			await syncCollection(collection, dataSource, fieldsToSync, selectedSlugField);
 			framer.closePlugin("Synchronization successful", { variant: "success" });
 		} catch (error) {
 			console.error(`[Marble] Sync error:`, error);
@@ -207,10 +241,36 @@ export function FieldMapping({
 		<main className="framer-hide-scrollbar mapping">
 			<hr className="sticky-divider" />
 			<form onSubmit={handleSubmit}>
+				<label className="slug-field" htmlFor="slugField">
+					Slug Field
+					<select
+						required
+						id="slugField"
+						name="slugField"
+						className="field-input"
+						value={selectedSlugField?.id ?? ""}
+						onChange={(event) => {
+							const field = possibleSlugFields.find(
+								(f) => f.id === event.target.value,
+							);
+							if (field) setSelectedSlugField(field);
+						}}
+						disabled={!isAllowedToManage}
+					>
+						{possibleSlugFields.map((f) => (
+							<option key={`slug-field-${f.id}`} value={f.id}>
+								{f.name}
+							</option>
+						))}
+					</select>
+				</label>
+
 				<div className="fields">
 					<span className="fields-column">Column</span>
 					<span>Field</span>
-					{fields.map((field) => (
+					{fields
+						.filter((field) => field.id !== "slug")
+						.map((field) => (
 						<FieldMappingRow
 							key={`field-${field.id}`}
 							field={field}

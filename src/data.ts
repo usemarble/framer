@@ -14,6 +14,7 @@ import type { Author } from "@usemarble/sdk/models/author"
 export const PLUGIN_KEYS = {
     DATA_SOURCE_ID: "dataSourceId",
     API_KEY: "apiKey",
+    SLUG_FIELD_ID: "slugFieldId",
 } as const
 
 // Use the Vite proxy to bypass CORS. Requests to /marble-api/* are proxied
@@ -39,6 +40,7 @@ export const dataSourceOptions = [
 
 const postFields: ManagedCollectionFieldInput[] = [
     { id: "title", name: "Title", type: "string" },
+    { id: "slug", name: "Slug", type: "string" },
     { id: "content", name: "Content", type: "formattedText" },
     { id: "featured", name: "Featured", type: "boolean" },
     { id: "coverImage", name: "Cover Image", type: "image" },
@@ -48,16 +50,19 @@ const postFields: ManagedCollectionFieldInput[] = [
 
 const categoryFields: ManagedCollectionFieldInput[] = [
     { id: "name", name: "Name", type: "string" },
+    { id: "slug", name: "Slug", type: "string" },
     { id: "description", name: "Description", type: "string" },
 ]
 
 const tagFields: ManagedCollectionFieldInput[] = [
     { id: "name", name: "Name", type: "string" },
+    { id: "slug", name: "Slug", type: "string" },
     { id: "description", name: "Description", type: "string" },
 ]
 
 const authorFields: ManagedCollectionFieldInput[] = [
     { id: "name", name: "Name", type: "string" },
+    { id: "slug", name: "Slug", type: "string" },
     { id: "bio", name: "Bio", type: "string" },
     { id: "role", name: "Role", type: "string" },
     { id: "image", name: "Image", type: "image" },
@@ -80,6 +85,19 @@ function getFieldsForResource(resourceId: string): ManagedCollectionFieldInput[]
 
 // Types are imported from @usemarble/sdk/models
 type MarbleItem = Post | Category | Tag | Author
+
+const MAX_SLUG_LENGTH = 60
+
+function slugifyAndTruncate(value: string): string {
+    const slugified = value
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "")
+    return slugified.slice(0, MAX_SLUG_LENGTH)
+}
 
 // --- Image upload helper ---
 
@@ -260,7 +278,8 @@ export function mergeFieldsWithExistingFields(
 export async function syncCollection(
     collection: ManagedCollection,
     dataSource: DataSource,
-    fields: readonly ManagedCollectionFieldInput[]
+    fields: readonly ManagedCollectionFieldInput[],
+    slugField: ManagedCollectionFieldInput
 ) {
     const items: ManagedCollectionItemInput[] = []
     const unsyncedItems = new Set(await collection.getItemIds())
@@ -269,11 +288,17 @@ export async function syncCollection(
         const item = dataSource.items[i]
         if (!item) throw new Error("Logic error")
 
-        const slugValue = item["slug"]
-        if (!slugValue || typeof slugValue.value !== "string") {
+        const slugFieldValue = item[slugField.id]
+        if (!slugFieldValue || typeof slugFieldValue.value !== "string") {
             console.warn(`Skipping item at index ${i} because it doesn't have a valid slug`)
             continue
         }
+
+        const rawSlugValue = slugFieldValue.value
+        const slugValue =
+            slugField.id === "slug"
+                ? rawSlugValue.slice(0, MAX_SLUG_LENGTH)
+                : slugifyAndTruncate(rawSlugValue)
 
         const marbleId = item["__marbleId"]
         const marbleIdStr =
@@ -284,14 +309,13 @@ export async function syncCollection(
                 ? marbleId.value
                 : null
 
-        // Use Marble id for Framer item id (avoids slug length limits); slug stays for display
-        const itemId = marbleIdStr ?? slugValue.value
-        unsyncedItems.delete(slugValue.value)
+        const itemId = marbleIdStr ?? slugValue
+        unsyncedItems.delete(slugValue)
         unsyncedItems.delete(itemId)
 
         const fieldData: FieldDataInput = {}
         for (const [fieldName, value] of Object.entries(item)) {
-            if (fieldName === "__marbleId") continue
+            if (fieldName === "__marbleId" || fieldName === "slug") continue
             const field = fields.find(field => field.id === fieldName)
             if (!field) continue
             fieldData[field.id] = value
@@ -299,7 +323,7 @@ export async function syncCollection(
 
         items.push({
             id: itemId,
-            slug: slugValue.value,
+            slug: slugValue,
             draft: false,
             fieldData,
         })
@@ -313,6 +337,7 @@ export async function syncCollection(
     console.log(`[Marble] Sync complete`)
 
     await collection.setPluginData(PLUGIN_KEYS.DATA_SOURCE_ID, dataSource.id)
+    await collection.setPluginData(PLUGIN_KEYS.SLUG_FIELD_ID, slugField.id)
 }
 
 export const syncMethods = [
@@ -324,6 +349,7 @@ export const syncMethods = [
 export async function syncExistingCollection(
     collection: ManagedCollection,
     previousDataSourceId: string | null,
+    previousSlugFieldId: string | null,
     apiKey: string | null
 ): Promise<{ didSync: boolean }> {
     if (!previousDataSourceId || !apiKey) {
@@ -342,7 +368,17 @@ export async function syncExistingCollection(
         const dataSource = await getDataSource(previousDataSourceId, apiKey)
         const existingFields = await collection.getFields()
 
-        await syncCollection(collection, dataSource, existingFields)
+        const slugField =
+            dataSource.fields.find((f) => f.id === previousSlugFieldId) ??
+            dataSource.fields.find((f) => f.type === "string" && f.id === "slug") ??
+            dataSource.fields.find((f) => f.type === "string")
+
+        if (!slugField) {
+            console.error("[Marble] No slug field available")
+            return { didSync: false }
+        }
+
+        await syncCollection(collection, dataSource, existingFields, slugField)
         return { didSync: true }
     } catch (error) {
         console.error(`[Marble] syncExistingCollection error:`, error)

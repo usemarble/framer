@@ -9,12 +9,14 @@ import { SelectDataSource } from "./components/SelectDataSource";
 interface AppProps {
 	collection: ManagedCollection;
 	previousDataSourceId: string | null;
+	previousSlugFieldId: string | null;
 	previousApiKey: string | null;
 }
 
 export function App({
 	collection,
 	previousDataSourceId,
+	previousSlugFieldId,
 	previousApiKey,
 }: AppProps) {
 	const [dataSource, setDataSource] = useState<DataSource | null>(null);
@@ -95,6 +97,7 @@ export function App({
 		<FieldMapping
 			collection={collection}
 			dataSource={dataSource}
+			initialSlugFieldId={previousSlugFieldId}
 		/>
 	);
 }
