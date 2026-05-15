@@ -1,9 +1,6 @@
 {
   "id": "948e6d",
   "name": "Marble",
-  "modes": [
-    "configureManagedCollection",
-    "syncManagedCollection"
-  ],
+  "modes": ["configureManagedCollection", "syncManagedCollection"],
   "icon": "/icon.svg"
 }
