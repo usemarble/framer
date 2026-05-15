@@ -5,7 +5,7 @@ import type { Tag } from "@usemarble/sdk/models/tag";
 import type { FieldDataInput } from "framer-plugin";
 import type { MarbleItem } from "../types";
 import { sanitizeHtml } from "./sanitize";
-import { isAllowedMarbleImageUrl } from "./url";
+import { isAllowedImageUrl } from "./url";
 
 function mapPostToFieldData(post: Post): FieldDataInput {
   const fieldData: FieldDataInput = {
@@ -28,7 +28,7 @@ function mapPostToFieldData(post: Post): FieldDataInput {
     fieldData.updatedAt = { type: "date", value: String(post.updatedAt) };
   }
 
-  if (post.coverImage && isAllowedMarbleImageUrl(post.coverImage)) {
+  if (post.coverImage && isAllowedImageUrl(post.coverImage)) {
     fieldData.coverImage = { type: "image", value: post.coverImage };
   }
 
@@ -62,7 +62,7 @@ function mapAuthorToFieldData(author: Author): FieldDataInput {
     role: { type: "string", value: author.role ?? "" },
   };
 
-  if (author.image && isAllowedMarbleImageUrl(author.image)) {
+  if (author.image && isAllowedImageUrl(author.image)) {
     fieldData.image = { type: "image", value: author.image };
   }
 
