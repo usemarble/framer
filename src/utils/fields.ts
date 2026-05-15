@@ -5,6 +5,7 @@ export const dataSourceOptions = [
   { id: "categories", name: "Categories" },
   { id: "tags", name: "Tags" },
   { id: "authors", name: "Authors" },
+  { id: "media", name: "Media" },
 ] as const;
 
 const fieldsByResource = {
@@ -33,6 +34,20 @@ const fieldsByResource = {
     { id: "bio", name: "Bio", type: "string" },
     { id: "role", name: "Role", type: "string" },
     { id: "image", name: "Image", type: "image" },
+  ],
+  media: [
+    { id: "name", name: "Name", type: "string" },
+    { id: "type", name: "Type", type: "string" },
+    { id: "preview", name: "Preview", type: "image" },
+    { id: "file", name: "File", type: "file", allowedFileTypes: ["*"] },
+    { id: "url", name: "URL", type: "link" },
+    { id: "alt", name: "Alt Text", type: "string" },
+    { id: "size", name: "Size", type: "number" },
+    { id: "width", name: "Width", type: "number" },
+    { id: "height", name: "Height", type: "number" },
+    { id: "duration", name: "Duration", type: "number" },
+    { id: "createdAt", name: "Created At", type: "date" },
+    { id: "updatedAt", name: "Updated At", type: "date" },
   ],
 } satisfies Record<string, ManagedCollectionFieldInput[]>;
 

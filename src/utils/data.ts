@@ -14,7 +14,7 @@ import {
 import type { DataSource, MarbleItem } from "../types";
 import { getFieldsForResource } from "./fields";
 import { mapItemToFieldData } from "./mappers";
-import { MAX_SLUG_LENGTH, slugifyAndTruncate } from "./slug";
+import { ensureUniqueSlug, MAX_SLUG_LENGTH, slugifyAndTruncate } from "./slug";
 import { getValidatedNextPage } from "./url";
 
 export async function getDataSource(
@@ -168,6 +168,7 @@ export async function syncCollection(
 ) {
   const items: ManagedCollectionItemInput[] = [];
   const unsyncedItems = new Set(await collection.getItemIds());
+  const usedSlugs = new Set<string>();
 
   for (let i = 0; i < dataSource.items.length; i++) {
     const item = dataSource.items[i];
@@ -183,12 +184,15 @@ export async function syncCollection(
       continue;
     }
 
-    const slugValue =
+    const baseSlug =
       slugField.id === "slug"
         ? rawSlugValue.slice(0, MAX_SLUG_LENGTH)
         : slugifyAndTruncate(rawSlugValue);
 
-    const itemId = getMarbleItemId(item) ?? slugValue;
+    const itemId = getMarbleItemId(item) ?? baseSlug;
+    const slugValue = ensureUniqueSlug(baseSlug, usedSlugs, itemId);
+    usedSlugs.add(slugValue);
+
     unsyncedItems.delete(slugValue);
     unsyncedItems.delete(itemId);
 

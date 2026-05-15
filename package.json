@@ -1,6 +1,20 @@
 {
+  "name": "marble",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "vite build",
+    "check": "ultracite check",
+    "dev": "vite",
+    "format": "ultracite fix",
+    "check-typescript": "tsc",
+    "pack": "npx framer-plugin-tools@latest pack",
+    "preview": "vite preview",
+    "fix": "ultracite fix"
+  },
   "dependencies": {
-    "@usemarble/sdk": "^1.1.2",
+    "@usemarble/sdk": "^1.2.1",
     "framer-plugin": "^3.10.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -20,19 +34,5 @@
     "vite": "^7.1.11",
     "vite-plugin-framer": "^1.0.7",
     "vite-plugin-mkcert": "^1.17.8"
-  },
-  "name": "marble",
-  "scripts": {
-    "build": "vite build",
-    "check": "ultracite check",
-    "dev": "vite",
-    "format": "ultracite fix",
-    "check-typescript": "tsc",
-    "pack": "npx framer-plugin-tools@latest pack",
-    "preview": "vite preview",
-    "fix": "ultracite fix"
-  },
-  "type": "module",
-  "version": "0.0.0",
-  "private": true
+  }
 }

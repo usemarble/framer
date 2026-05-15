@@ -1,5 +1,6 @@
 import type { Author } from "@usemarble/sdk/models/author";
 import type { Category } from "@usemarble/sdk/models/category";
+import type { Media } from "@usemarble/sdk/models/media";
 import type { Post } from "@usemarble/sdk/models/post";
 import type { Tag } from "@usemarble/sdk/models/tag";
 import type { FieldDataInput } from "framer-plugin";
@@ -69,6 +70,51 @@ function mapAuthorToFieldData(author: Author): FieldDataInput {
   return fieldData;
 }
 
+function mapMediaToFieldData(media: Media): FieldDataInput {
+  const fieldData: FieldDataInput = {
+    __marbleId: { type: "string", value: media.id },
+    name: { type: "string", value: media.name },
+    type: { type: "string", value: media.type },
+    url: { type: "link", value: media.url },
+    alt: { type: "string", value: media.alt ?? "" },
+    size: { type: "number", value: media.size },
+  };
+
+  if (isAllowedImageUrl(media.url)) {
+    fieldData.file = { type: "file", value: media.url };
+
+    if (media.type === "image") {
+      fieldData.preview = {
+        type: "image",
+        value: media.url,
+        alt: media.alt ?? undefined,
+      };
+    }
+  }
+
+  if (media.width !== null) {
+    fieldData.width = { type: "number", value: media.width };
+  }
+
+  if (media.height !== null) {
+    fieldData.height = { type: "number", value: media.height };
+  }
+
+  if (media.duration !== null) {
+    fieldData.duration = { type: "number", value: media.duration };
+  }
+
+  if (media.createdAt) {
+    fieldData.createdAt = { type: "date", value: String(media.createdAt) };
+  }
+
+  if (media.updatedAt) {
+    fieldData.updatedAt = { type: "date", value: String(media.updatedAt) };
+  }
+
+  return fieldData;
+}
+
 export function mapItemToFieldData(
   resourceId: string,
   item: MarbleItem
@@ -82,6 +128,8 @@ export function mapItemToFieldData(
       return mapTagToFieldData(item as Tag);
     case "authors":
       return mapAuthorToFieldData(item as Author);
+    case "media":
+      return mapMediaToFieldData(item as Media);
     default:
       return {};
   }

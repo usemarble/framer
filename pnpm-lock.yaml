@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@usemarble/sdk':
-        specifier: ^1.1.2
-        version: 1.1.2
+        specifier: ^1.2.1
+        version: 1.2.1
       framer-plugin:
         specifier: ^3.10.3
         version: 3.10.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -528,8 +528,8 @@ packages:
   '@types/sanitize-html@2.16.1':
     resolution: {integrity: sha512-n9wjs8bCOTyN/ynwD8s/nTcTreIHB1vf31vhLMGqUPNHaweKC4/fAl4Dj+hUlCTKYgm4P3k83fmiFfzkZ6sgMA==}
 
-  '@usemarble/sdk@1.1.2':
-    resolution: {integrity: sha512-G8yTm2vqOagA78bj1y2xZM5E0qDzUr3ZyCxcfNmlpIfUDmhlOE/D6mpebXT3A1A/D3ngvcDr2hhg5tvN5P0Kpg==}
+  '@usemarble/sdk@1.2.1':
+    resolution: {integrity: sha512-rklBYmj7sdN5VD0bkLZRttuzOTTj618Ob6V112+gP1a2eW6FQ3kYixPK7hahME3pP4eHiyC/sSZVSWwddg7tsQ==}
 
   '@vitejs/plugin-react-swc@4.2.3':
     resolution: {integrity: sha512-QIluDil2prhY1gdA3GGwxZzTAmLdi8cQ2CcuMW4PB/Wu4e/1pzqrwhYWVd09LInCRlDUidQjd0B70QWbjWtLxA==}
@@ -973,9 +973,6 @@ packages:
     engines: {node: '>= 14.6'}
     hasBin: true
 
-  zod@4.3.6:
-    resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
-
   zod@4.4.3:
     resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
 
@@ -1254,9 +1251,9 @@ snapshots:
     dependencies:
       htmlparser2: 10.1.0
 
-  '@usemarble/sdk@1.1.2':
+  '@usemarble/sdk@1.2.1':
     dependencies:
-      zod: 4.3.6
+      zod: 4.4.3
 
   '@vitejs/plugin-react-swc@4.2.3(vite@7.3.1(jiti@2.6.1)(yaml@2.9.0))':
     dependencies:
@@ -1686,7 +1683,5 @@ snapshots:
       isexe: 2.0.0
 
   yaml@2.9.0: {}
-
-  zod@4.3.6: {}
 
   zod@4.4.3: {}
