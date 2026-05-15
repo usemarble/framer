@@ -1,6 +1,6 @@
 # Marble Framer Plugin
 
-Sync Marble content with Framer CMS. Map posts, categories, tags, and authors to CMS fields and import with one click.
+Sync Marble content with Framer CMS. Map posts, categories, tags, authors, and media files to CMS fields and import with one click.
 
 **Install from the [Framer Marketplace](https://marketplace.framer.com/marketplace/plugins/marble/)**
 
@@ -9,3 +9,4 @@ Sync Marble content with Framer CMS. Map posts, categories, tags, and authors to
 ```bash
 pnpm dev
 ```
+
